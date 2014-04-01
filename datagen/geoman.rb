@@ -53,7 +53,7 @@ while true do
   latitude = geo[1]
   longitude = geo[0]
   record = {
-    :user       => user,
+    :user       => user.to_s,
     :line       => curr_line,
     :station    => curr_station,
     :latitude   => latitude,
@@ -67,7 +67,6 @@ while true do
             :data => encode64(payload),
             :partition_key => "USER_PARTITION_1" # TODO
           }
-
   @client.put_record(data)
   puts "[#{loops}] User #{user} at #{curr_line}線 #{curr_station}駅, latitude=#{latitude}, longitude=#{longitude}"
   # TODO: we only target at Meguro station right now
