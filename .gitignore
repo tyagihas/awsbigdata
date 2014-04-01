@@ -10,5 +10,5 @@
 /bin
 
 /RemoteSystemsTempFiles
-/.metadata
-/.settings
+/.metadata/*
+/.settings/*
