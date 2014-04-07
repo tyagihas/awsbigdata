@@ -30,7 +30,7 @@ public class Client {
 		String stream = "test";
 		int iteration = 100;
 		int threashold = 1000;
-		String data = new String("00001,35.65,139.");
+		String data = new String("{\"user\":\"00001\",\"line\":\"ŽRŽè\",\"station\":\"‘å’Ë\",\"latitude\":35.");
 		Random rand = new Random();
 		try {				
 			long start = System.currentTimeMillis();
@@ -39,7 +39,7 @@ public class Client {
 				try {
 				  PutRecordRequest putRecordRequest = new PutRecordRequest();
 				  putRecordRequest.setStreamName(stream);
-				  putRecordRequest.setData(ByteBuffer.wrap((data+Integer.toString(rand.nextInt(65))).getBytes()));
+				  putRecordRequest.setData(ByteBuffer.wrap((data+Integer.toString(rand.nextInt(19)+52)+",\"longitude\":139."+Integer.toString(rand.nextInt(39)+51)+"}").getBytes()));
 				  putRecordRequest.setPartitionKey(myKey);
 				  PutRecordResult putRecordResult = client.putRecord(putRecordRequest);
 				}

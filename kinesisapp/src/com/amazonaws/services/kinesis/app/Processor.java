@@ -10,6 +10,8 @@ import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessor;
 import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessorCheckpointer;
 import com.amazonaws.services.kinesis.clientlibrary.types.ShutdownReason;
 import com.amazonaws.services.kinesis.model.Record;
+import com.amazonaws.util.json.JSONException;
+import com.amazonaws.util.json.JSONObject;
 
 /**
  * Processor 
@@ -35,7 +37,7 @@ public class Processor implements IRecordProcessor {
 	public Processor() {
 		counter = 0;
 		target = 1000;
-		bytearray = new byte[32];
+		bytearray = new byte[128];
 	}
 	
 	@Override
@@ -58,20 +60,28 @@ public class Processor implements IRecordProcessor {
 		Record rec;
 		for(int i = 0; i < arg0.size(); i++) {
 			rec = arg0.get(i);
-			verifyRecord(rec.getData());
+			try {
+				verifyRecord(rec.getData());
+			} 
+			catch (JSONException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
-	private boolean verifyRecord(ByteBuffer buffer) {
+	private boolean verifyRecord(ByteBuffer buffer) throws JSONException {
 		buffer.get(bytearray, 0, buffer.remaining());
-		String str = new String(bytearray);
-		String[] elements = str.split(",");
-		
-		if (users.contains(elements[0])) {
-			double x = new Double(elements[1]).doubleValue();
-			double y = new Double(elements[2]).doubleValue();
+		JSONObject json = new JSONObject(new String(bytearray));
+		String user = json.getString("user");
+		if (users.contains(user)) {
+			MessageProxy proxy = MessageProxy.getInstance();
+			String color = "#0" + user;
+			double x = json.getDouble("latitude");
+			double y = json.getDouble("longitude");
+			proxy.sendMesg(color + "," + Double.toString(700-(x-35.52)*3684) + "," + Double.toString((y-139.51)*1769));
+			System.out.println(x + "," + y);
 			if (coordsListener.verifyCoordinates(x, y)) {
-				System.out.println("Matched! '" + elements[0] + "' is at (" + x + ", " + y + ")");
+				System.out.println("Matched! '" + user + "' is at (" + x + ", " + y + ")");
 				return true;
 			}
 		}
@@ -83,10 +93,10 @@ public class Processor implements IRecordProcessor {
 	public void shutdown(IRecordProcessorCheckpointer arg0, ShutdownReason arg1) {
 	}
 	
-	public void test() {
+	public void test() throws JSONException {
 		String str = "00001,35.65,139.65";
 		initialize("test");
-		ByteBuffer buffer = ByteBuffer.allocateDirect(100);
+		ByteBuffer buffer = ByteBuffer.allocateDirect(128);
 		buffer.put(str.getBytes());
 		buffer.flip();
 		verifyRecord(buffer);
