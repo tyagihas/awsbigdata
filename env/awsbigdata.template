@@ -26,7 +26,7 @@
     },
 
     "AWSRegionArch2AMI" : {
-            "us-east-1": { "64": "ami-9d534ef4" }
+            "us-east-1": { "64": "ami-69495400" }
     }
   },
     
@@ -169,13 +169,13 @@
         "KeyName"        : { "Ref" : "KeyName" },
         "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
           "#!/bin/bash\n",
-          "su - ec2-user\n",
           "cd /home/ec2-user\n",
           "git clone https://github.com/tyagihas/awsbigdata.git\n",
           "cd ./awsbigdata/kinesisapp\n",
           "ant\n",
           "cd /home/ec2-user/bin\n",
           "chmod 755 *.sh\n",
+          "chown -R ec2-user:ec2-user /home/ec2-user\n",
           "/opt/aws/bin/cfn-signal -e 0 -r \"cfn-int setup complete\" '",
           { "Ref": "WaitHandle"},
           "'\n"
