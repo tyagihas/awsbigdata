@@ -1,0 +1,25 @@
+<html>
+<head>
+<script type='text/javascript' src='//code.jquery.com/jquery-1.10.2.js'></script>
+<script type="text/javascript">
+    var kinesisSocket = new WebSocket(
+        "ws://localhost:80/kinesisapp/stream"
+    );
+
+    kinesisSocket.onopen = function(e) {
+        console.log("onopen()");
+        kinesisSocket.send("Hellooooo");
+    }
+
+    kinesisSocket.onmessage = function(e) {
+    	console.log(e.data);
+        $('#mesg').append(e.data);
+    };
+</script>
+</head>
+<body>
+<div id='mesg'>
+</div>
+</body>
+
+</html>

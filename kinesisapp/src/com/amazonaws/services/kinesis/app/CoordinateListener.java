@@ -10,8 +10,8 @@ public class CoordinateListener {
 		public double y;
 	}
 	
-	private Coordinate coordsw;
-	private Coordinate coordne;
+	public static Coordinate coordsw;
+	public static Coordinate coordne;
 	
 	public CoordinateListener() {
 		coordsw = new Coordinate();
