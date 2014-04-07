@@ -26,7 +26,7 @@
     },
 
     "AWSRegionArch2AMI" : {
-            "us-east-1": { "64": "ami-69495400" }
+            "us-east-1": { "64": "ami-a74954ce" }
     }
   },
     
