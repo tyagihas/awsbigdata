@@ -5,12 +5,22 @@
   
   "Parameters" : {
     "KeyName" : {
-      "Description" : "Name of an existing EC2 KeyPair to enable SSH access to the instances",
+      "Description" : "Enter name of an existing EC2 KeyPair to enable SSH access to the instances",
       "Type" : "String",
       "MinLength": "1",
       "MaxLength": "64",
       "AllowedPattern" : "[-_ a-zA-Z0-9]*",
       "ConstraintDescription" : "can contain only alphanumeric characters, spaces, dashes and underscores."
+    },
+
+    "AWSAccessKey": {
+      "Type": "String",
+      "Description" : "Enter AWS Access Key."
+    },
+
+    "AWSSecretAccessKey": {
+      "Type": "String",
+      "Description" : "Enter AWS Secret Access Key."
     },
 
     "AvailabilityZone" : {
@@ -147,14 +157,14 @@
 
     "IPAddress" : {
       "Type" : "AWS::EC2::EIP",
-      "DependsOn" : "BDClient",
+      "DependsOn" : "BDClient1",
       "Properties" : {
         "Domain" : "vpc",
-        "InstanceId" : { "Ref" : "BDClient" }
+        "InstanceId" : { "Ref" : "BDClient1" }
       }
     },    
 
-    "BDClient": {  
+    "BDClient1": {  
       "Type": "AWS::EC2::Instance",
       "DependsOn" : "Subnet1",
       "Metadata" : {
@@ -167,15 +177,28 @@
         "SecurityGroupIds" : [ {"Ref" : "BDBootcampSG"} ],
         "SubnetId"  : { "Ref" : "Subnet1" },
         "KeyName"        : { "Ref" : "KeyName" },
+        "Tags": [{"Key": "Name","Value": "Workstation 1"}],
         "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
           "#!/bin/bash\n",
           "cd /home/ec2-user\n",
           "git clone https://github.com/tyagihas/awsbigdata.git\n",
-          "cd ./awsbigdata/kinesisapp\n",
-          "ant\n",
           "cd /home/ec2-user/bin\n",
-          "chmod 755 *.sh\n",
+          "cd ./awsbigdata/kinesisapp\n",
+          "/home/ec2-user/ant/bin/ant > build.log\n",
+          "chmod -R 755 *.sh\n",
           "chown -R ec2-user:ec2-user /home/ec2-user\n",
+          "echo 'export AWS_ACCESS_KEY=",
+          {
+            "Ref": "AWSAccessKey"
+          },
+          "'  >> /home/ec2-user/.bash_profile\n",
+          "echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY' >> /home/ec2-user/.bash_profile\n",
+          "echo 'export AWS_SECRET_ACCESS_KEY=",
+          {
+            "Ref": "AWSSecretAccessKey"
+          },
+          "'  >> /home/ec2-user/.bash_profile\n",
+          "echo 'export AWS_SECRET_KEY=$AWS_SECRET_ACCESS_KEY' >> /home/ec2-user/.bash_profile\n",
           "/opt/aws/bin/cfn-signal -e 0 -r \"cfn-int setup complete\" '",
           { "Ref": "WaitHandle"},
           "'\n"
@@ -226,7 +249,7 @@
 
     "WaitCondition" : {
       "Type" : "AWS::CloudFormation::WaitCondition",
-      "DependsOn" : "BDClient",
+      "DependsOn" : "BDClient1",
       "Properties" : {
         "Handle" : {"Ref" : "WaitHandle"},
         "Timeout" : "600"

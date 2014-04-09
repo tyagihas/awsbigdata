@@ -15,7 +15,7 @@ awsbigdata repository contains all materials and source code including :
 
 
 ## Where to start
-Click this [link](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?templateURL=https://github.com/tyagihas/awsbigdata/blob/master/env/awsbigdata.template&stackName=AWSBigData) to initiate CloudFormation. 
+Click this [link](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?templateURL=https://s3.amazonaws.com/awsbigdata-boot-camp/awsbigdata.template&stackName=AWSBigData) to initiate CloudFormation. 
 
 
 ## Access log format
