@@ -1,0 +1,65 @@
+/* EMR Hands-on */
+
+ADD jar s3://elasticmapreduce/samples/hive-ads/libs/jsonserde.jar;
+
+CREATE EXTERNAL TABLE IF NOT EXISTS input_logs (
+host STRING,
+user STRING,
+method STRING,
+path STRING,
+code STRING,
+size INT,
+referer STRING,
+node STRING,
+timestamp STRING,
+version INT,
+type STRING,
+tags STRING,
+geoip STRING
+)
+ROW FORMAT SERDE 'com.amazon.elasticmapreduce.JsonSerde'
+with serdeproperties (
+'paths'='host,user,method,path,code,size,referer,@node,@timestamp,@version,type,tags,geoip.country_code2'
+)
+LOCATION 's3://';
+
+
+CREATE EXTERNAL TABLE IF NOT EXISTS output_logs (
+user STRING,
+path STRING,
+timestamp STRING,
+geoip STRING
+)
+PARTITIONED BY (dt STRING)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n'
+STORED AS TEXTFILE
+LOCATION 's3://';
+
+SET hive.exec.dynamic.partition=true;
+SET hive.exec.dynamic.partition.mode=nonstrict;
+
+FROM input_logs in
+INSERT OVERWRITE TABLE output_logs PARTITION(dt)
+SELECT
+in.user,
+in.path,
+in.timestamp,
+in.geoip,
+split(in.timestamp,'T')[0]
+DISTRIBUTE BY split(in.timestamp,'T')[0];
+
+
+/* Redshift Hands-on */
+CREATE table logs (
+user1 VARCHAR(10),
+path VARCHAR(2048),
+time VARCHAR(24),
+geoip VARCHAR(2)
+);
+
+copy logs from 's3://toshiake-bigdatabootcamp/output/'
+CREDENTIALS 'aws_access_key_id=;aws_secret_access_key='
+delimiter ','
+CSV QUOTE '''';
+
