@@ -81,7 +81,7 @@ while true do
 
   data = {
             :stream_name => kinesis_stream,
-            :data => encode64(payload),
+            :data => payload,
             :partition_key => "USER_PARTITION_1" # TODO
           }
   @client.put_record(data)
