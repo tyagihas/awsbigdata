@@ -5,13 +5,13 @@
 JVM_Params="-Xms256m -Xmx256m"
 
 APPNAME=KinesisApp
-STREAM=test
-ACCESSPATH="/games"
+STREAM=aws-jp-big-data-bootcamp
+ACCESSPATH="/item/software/2878"
 
 COORDNE="35.71,139.75"
 COORDSW="35.60,139.58"
 
-QUERY="select userid from accesslog where uri = ?"
+QUERY="select distinct(user1) from logs where path = ? and geoip = 'JP'"
 
 CPATH=
 for i in `find ../../lib -name "*.jar"`

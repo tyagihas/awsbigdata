@@ -35,7 +35,7 @@ Access logs are already [generated](https://github.com/uprush/apache_log_gen) an
 - Records are stored in Amazon Redshift.
 
 ```javascript
-CREATE table accesslogs (
+CREATE table logs (
 user1 VARCHAR(10),
 path VARCHAR(2048),
 time VARCHAR(24),
