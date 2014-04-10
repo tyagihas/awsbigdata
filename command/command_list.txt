@@ -39,16 +39,15 @@ LOCATION 's3://';
 SET hive.exec.dynamic.partition=true;
 SET hive.exec.dynamic.partition.mode=nonstrict;
 
-FROM input_logs in
 INSERT OVERWRITE TABLE output_logs PARTITION(dt)
 SELECT
-in.user,
-in.path,
-in.timestamp,
-in.geoip,
-split(in.timestamp,'T')[0]
-DISTRIBUTE BY split(in.timestamp,'T')[0];
-
+user,
+path,
+timestamp,
+geoip,
+split(timestamp,'T')[0]
+FROM input_logs
+DISTRIBUTE BY split(timestamp,'T')[0];
 
 /* Redshift Hands-on */
 CREATE table logs (
