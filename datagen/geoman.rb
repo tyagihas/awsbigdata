@@ -85,7 +85,7 @@ while true do
             :partition_key => "USER_PARTITION_1" # TODO
           }
   @client.put_record(data)
-  puts "[#{loops}] User #{user} at #{curr_line}線 #{curr_station}駅, latitude=#{latitude}, longitude=#{longitude}"
+  puts "[#{loops}] User #{user} at #{curr_line} #{curr_station}駅, latitude=#{latitude}, longitude=#{longitude}"
   # TODO: we only target at Meguro station right now
   if curr_station == "目黒" then
     puts
