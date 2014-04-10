@@ -36,7 +36,7 @@ public class Processor implements IRecordProcessor {
 	
 	public Processor() {
 		counter = 0;
-		target = 1000;
+		target = 50;
 		bytearray = new byte[128];
 	}
 	
@@ -55,8 +55,10 @@ public class Processor implements IRecordProcessor {
 	@Override
 	public void processRecords(List<Record> arg0, IRecordProcessorCheckpointer arg1) {
 		counter += arg0.size();
-		if (counter > target)
+		if (counter > target) {
 			System.out.println("Received : " + counter + " records");
+			target += target;
+		}
 		Record rec;
 		for(int i = 0; i < arg0.size(); i++) {
 			rec = arg0.get(i);

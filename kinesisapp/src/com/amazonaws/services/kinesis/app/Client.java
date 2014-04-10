@@ -30,7 +30,7 @@ public class Client {
 		String stream = "test";
 		int iteration = 100;
 		int threashold = 1000;
-		String data = new String("{\"user\":\"00001\",\"line\":\"aaa\",\"station\":\"bbb\",\"latitude\":35.");
+		String data = new String("{\"user\":\"10125\",\"line\":\"aaa\",\"station\":\"bbb\",\"latitude\":35.");
 		Random rand = new Random();
 		try {				
 			long start = System.currentTimeMillis();

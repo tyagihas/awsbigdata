@@ -2,9 +2,8 @@
 <head>
 <script type='text/javascript' src='//code.jquery.com/jquery-1.10.2.js'></script>
 <script type="text/javascript">
-    var kinesisSocket = new WebSocket(
-        "ws://localhost:80/kinesisapp/stream"
-    );
+    var host = window.document.location.host.replace(/:.*/, '');
+    var kinesisSocket = new WebSocket("ws://" + host + ":80/kinesisapp/stream");
 
     kinesisSocket.onopen = function(e) {
         console.log("onopen()");
