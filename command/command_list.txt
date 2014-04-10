@@ -21,7 +21,7 @@ ROW FORMAT SERDE 'com.amazon.elasticmapreduce.JsonSerde'
 with serdeproperties (
 'paths'='host,user,method,path,code,size,referer,@node,@timestamp,@version,type,tags,geoip.country_code2'
 )
-LOCATION 's3://';
+LOCATION 's3://awsbigdata-boot-camp/input/';
 
 
 CREATE EXTERNAL TABLE IF NOT EXISTS output_logs (
