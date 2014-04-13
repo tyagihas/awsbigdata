@@ -1,7 +1,13 @@
-/* EMR Hands-on */
+/*****
+*
+* EMR Hands-on
+*
+*****/
 
+/* ADD Library for Json parser */
 ADD jar s3://elasticmapreduce/samples/hive-ads/libs/jsonserde.jar;
 
+/* Create table for input data */
 CREATE EXTERNAL TABLE IF NOT EXISTS input_logs (
 host STRING,
 user STRING,
@@ -23,7 +29,12 @@ with serdeproperties (
 )
 LOCATION 's3://awsbigdata-boot-camp/input/';
 
-
+/*
+*
+* Create table for output data
+* Please input your S3 bucket name into LOCATION section.
+*
+*/
 CREATE EXTERNAL TABLE IF NOT EXISTS output_logs (
 user STRING,
 path STRING,
@@ -34,11 +45,13 @@ PARTITIONED BY (dt STRING)
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n'
 STORED AS TEXTFILE
-LOCATION 's3://';
+LOCATION 's3://{input_your_bucket}/output/
 
+/* Set parameter for partition */
 SET hive.exec.dynamic.partition=true;
 SET hive.exec.dynamic.partition.mode=nonstrict;
 
+/* Inser data from input table to output table */
 INSERT OVERWRITE TABLE output_logs PARTITION(dt)
 SELECT
 user,
@@ -49,7 +62,16 @@ split(timestamp,'T')[0]
 FROM input_logs
 DISTRIBUTE BY split(timestamp,'T')[0];
 
-/* Redshift Hands-on */
+
+
+
+/*****
+*
+* Redshift Hands-on
+*
+*****/
+
+/* Create table for logs */
 CREATE table logs (
 user1 VARCHAR(10),
 path VARCHAR(2048),
@@ -57,8 +79,14 @@ time VARCHAR(24),
 geoip VARCHAR(2)
 );
 
-copy logs from 's3://toshiake-bigdatabootcamp/output/'
-CREDENTIALS 'aws_access_key_id=;aws_secret_access_key='
+/*
+*
+* Copy data from S3 to Redshift table
+* Please input your S3 bucket name into FROM section and CREDENTIALS into CREDENTIALS section.
+* 
+*/
+COPY logs from 's3://{input_your_bucket}/output/'
+CREDENTIALS 'aws_access_key_id={input_your_access_key};aws_secret_access_key={input_your_secret_key}'
 delimiter ','
 CSV QUOTE '''';
 
