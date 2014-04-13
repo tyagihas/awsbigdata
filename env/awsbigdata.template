@@ -36,7 +36,7 @@
     },
 
     "AWSRegionArch2AMI" : {
-            "us-east-1": { "64": "ami-a74954ce" }
+            "us-east-1": { "64": "ami-b7fee2de" }
     }
   },
     
@@ -182,7 +182,47 @@
           "#!/bin/bash\n",
           "cd /home/ec2-user\n",
           "git clone https://github.com/tyagihas/awsbigdata.git\n",
-          "cd /home/ec2-user/bin\n",
+          "cd ./awsbigdata/kinesisapp\n",
+          "/home/ec2-user/ant/bin/ant > build.log\n",
+          "chmod -R 755 *.sh\n",
+          "chown -R ec2-user:ec2-user /home/ec2-user\n",
+          "echo 'export AWS_ACCESS_KEY=",
+          {
+            "Ref": "AWSAccessKey"
+          },
+          "'  >> /home/ec2-user/.bash_profile\n",
+          "echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY' >> /home/ec2-user/.bash_profile\n",
+          "echo 'export AWS_SECRET_ACCESS_KEY=",
+          {
+            "Ref": "AWSSecretAccessKey"
+          },
+          "'  >> /home/ec2-user/.bash_profile\n",
+          "echo 'export AWS_SECRET_KEY=$AWS_SECRET_ACCESS_KEY' >> /home/ec2-user/.bash_profile\n",
+          "/opt/aws/bin/cfn-signal -e 0 -r \"cfn-int setup complete\" '",
+          { "Ref": "WaitHandle"},
+          "'\n"
+        ]]}}        
+      }
+    },
+
+    "BDClient2": {  
+      "Type": "AWS::EC2::Instance",
+      "DependsOn" : "Subnet1",
+      "Metadata" : {
+        "Comment1" : "Copying files and installing psql command line utility"
+      },
+      "Properties": {
+        "ImageId" : { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" },
+                          { "Fn::FindInMap" : [ "AWSInstanceType2Arch", "t1.micro", "Arch" ] } ] },
+        "InstanceType"   : "t1.micro",
+        "SecurityGroupIds" : [ {"Ref" : "BDBootcampSG"} ],
+        "SubnetId"  : { "Ref" : "Subnet1" },
+        "KeyName"        : { "Ref" : "KeyName" },
+        "Tags": [{"Key": "Name","Value": "Workstation 2"}],
+        "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
+          "#!/bin/bash\n",
+          "cd /home/ec2-user\n",
+          "git clone https://github.com/tyagihas/awsbigdata.git\n",
           "cd ./awsbigdata/kinesisapp\n",
           "/home/ec2-user/ant/bin/ant > build.log\n",
           "chmod -R 755 *.sh\n",
