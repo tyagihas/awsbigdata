@@ -190,9 +190,14 @@
         "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
           "#!/bin/bash\n",
           "cd /home/ec2-user\n",
+          "wget https://s3-ap-northeast-1.amazonaws.com/redshift-boot-camp/redshift_boot_camp_handson_bn.zip\n",
+          "unzip ./redshift_boot_camp_handson_bn.zip\n",
+          "rm ./redshift_boot_camp_handson_bn.zip\n",
+          "echo \"export CLASSPATH=/home/ec2-user/classes:/home/ec2-user/lib/postgresql-8.4-703.jdbc4.jar\" >> ./.bashrc\n",
           "git clone https://github.com/tyagihas/awsbigdata.git\n",
           "cd ./awsbigdata/kinesisapp\n",
           "/home/ec2-user/ant/bin/ant > build.log\n",
+          "cd /home/ec2-user\n",
           "chmod -R 755 *.sh\n",
           "chown -R ec2-user:ec2-user /home/ec2-user\n",
           "echo 'export AWS_ACCESS_KEY=",
@@ -231,9 +236,14 @@
         "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
           "#!/bin/bash\n",
           "cd /home/ec2-user\n",
+          "wget https://s3-ap-northeast-1.amazonaws.com/redshift-boot-camp/redshift_boot_camp_handson_bn.zip\n",
+          "unzip ./redshift_boot_camp_handson_bn.zip\n",
+          "rm ./redshift_boot_camp_handson_bn.zip\n",
+          "echo \"export CLASSPATH=/home/ec2-user/classes:/home/ec2-user/lib/postgresql-8.4-703.jdbc4.jar\" >> ./.bashrc\n",
           "git clone https://github.com/tyagihas/awsbigdata.git\n",
           "cd ./awsbigdata/kinesisapp\n",
           "/home/ec2-user/ant/bin/ant > build.log\n",
+          "cd /home/ec2-user\n",
           "chmod -R 755 *.sh\n",
           "chown -R ec2-user:ec2-user /home/ec2-user\n",
           "echo 'export AWS_ACCESS_KEY=",
@@ -267,29 +277,6 @@
         ],
         "VpcId" : { "Ref" : "BDVPC" }
       }      
-    },
-
-    "BDClusterSubnetGroup" : {
-      "Type": "AWS::Redshift::ClusterSubnetGroup",
-      "DependsOn" : "Subnet1",
-      "Properties": {
-        "Description" : "Redshift Cluster Subnet Group",
-        "SubnetIds" : [{ "Ref" : "Subnet1" }]
-      }
-    },
-
-    "BDRedshiftCluster" : {
-      "Type": "AWS::Redshift::Cluster",
-      "DependsOn" : "BDClusterSubnetGroup",
-      "Properties": {
-        "MasterUsername" : "awsuser",
-        "MasterUserPassword" : "Password1",
-        "ClusterSubnetGroupName" : { "Ref" : "BDClusterSubnetGroup" },
-        "DBName" : "bddb",
-        "NodeType" : "dw2.large",
-        "ClusterType" : "single-node",
-        "VpcSecurityGroupIds" : [{ "Ref" : "BDBootcampSG" }]
-      }
     },
 
     "WaitHandle" : {
