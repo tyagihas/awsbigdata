@@ -5,7 +5,7 @@
 JVM_Params="-Xms256m -Xmx256m"
 
 APPNAME=KinesisApp
-STREAM=aws-jp-big-data-bootcamp
+STREAM=$1
 ACCESSPATH="/item/software/2878"
 
 COORDNE="35.71,139.75"

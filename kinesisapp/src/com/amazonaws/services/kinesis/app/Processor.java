@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+// import com.amazonaws.services.dynamodb.loader.Loader;
 import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessor;
 import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessorCheckpointer;
 import com.amazonaws.services.kinesis.clientlibrary.types.ShutdownReason;
@@ -31,6 +32,7 @@ public class Processor implements IRecordProcessor {
 	private HashSet<String> users;
 	private CoordinateListener coordsListener;
 	private LogAnalyzer logAnalyzer;
+	// private Loader loader;
 	
 	private byte[] bytearray;
 	
@@ -45,6 +47,7 @@ public class Processor implements IRecordProcessor {
 		coordsListener = new CoordinateListener();
 		try {
 			logAnalyzer = new LogAnalyzer();
+			// loader = new Loader();
 			users = logAnalyzer.getUsers();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -84,6 +87,7 @@ public class Processor implements IRecordProcessor {
 			System.out.println(x + "," + y);
 			if (coordsListener.verifyCoordinates(x, y)) {
 				System.out.println("Matched! '" + user + "' is at (" + x + ", " + y + ")");
+				// loader.put(user, System.currentTimeMillis(), x, y);
 				return true;
 			}
 		}
