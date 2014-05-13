@@ -25,7 +25,7 @@
 
     "AvailabilityZone" : {
       "Type" : "String",
-      "Default" : "us-east-1a",
+      "Default" : "us-east-1c",
       "Description" : "Specify AZ in which EC2 instance and Redshift cluster will be running."
     }
   },
