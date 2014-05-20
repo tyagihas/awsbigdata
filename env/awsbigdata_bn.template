@@ -5,7 +5,7 @@
   
   "Parameters" : {
     "KeyName" : {
-      "Description" : "Enter name of an existing EC2 KeyPair to enable SSH access to the instances",
+      "Description" : "Enter name of fan existing EC2 KeyPair to enable SSH access to the instances",
       "Type" : "String",
       "MinLength": "1",
       "MaxLength": "64",
@@ -155,24 +155,6 @@
       }
     },
 
-    "IPAddress1" : {
-      "Type" : "AWS::EC2::EIP",
-      "DependsOn" : "BDClient1",
-      "Properties" : {
-        "Domain" : "vpc",
-        "InstanceId" : { "Ref" : "BDClient1" }
-      }
-    },    
-
-    "IPAddress2" : {
-      "Type" : "AWS::EC2::EIP",
-      "DependsOn" : "BDClient2",
-      "Properties" : {
-        "Domain" : "vpc",
-        "InstanceId" : { "Ref" : "BDClient2" }
-      }
-    },    
-
     "BDClient1": {  
       "Type": "AWS::EC2::Instance",
       "DependsOn" : "Subnet1",
@@ -182,9 +164,14 @@
       "Properties": {
         "ImageId" : { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" },
                           { "Fn::FindInMap" : [ "AWSInstanceType2Arch", "t1.micro", "Arch" ] } ] },
+        "NetworkInterfaces" : [{
+          "GroupSet"                 : [{ "Ref" : "BDBootcampSG" }],
+          "AssociatePublicIpAddress" : "true",
+          "DeviceIndex"              : "0",
+          "DeleteOnTermination"      : "true",
+          "SubnetId"                 : { "Ref" : "Subnet1" }
+        }],
         "InstanceType"   : "t1.micro",
-        "SecurityGroupIds" : [ {"Ref" : "BDBootcampSG"} ],
-        "SubnetId"  : { "Ref" : "Subnet1" },
         "KeyName"        : { "Ref" : "KeyName" },
         "Tags": [{"Key": "Name","Value": "Workstation 1"}],
         "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
@@ -229,9 +216,14 @@
       "Properties": {
         "ImageId" : { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" },
                           { "Fn::FindInMap" : [ "AWSInstanceType2Arch", "t1.micro", "Arch" ] } ] },
+        "NetworkInterfaces" : [{
+          "GroupSet"                 : [{ "Ref" : "BDBootcampSG" }],
+          "AssociatePublicIpAddress" : "true",
+          "DeviceIndex"              : "0",
+          "DeleteOnTermination"      : "true",
+          "SubnetId"                 : { "Ref" : "Subnet1" }
+        }],
         "InstanceType"   : "t1.micro",
-        "SecurityGroupIds" : [ {"Ref" : "BDBootcampSG"} ],
-        "SubnetId"  : { "Ref" : "Subnet1" },
         "KeyName"        : { "Ref" : "KeyName" },
         "Tags": [{"Key": "Name","Value": "Workstation 2"}],
         "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
@@ -296,6 +288,10 @@
   },     
 
   "Outputs" : {
+    "VpcId" : {
+      "Description" : "VPCId of the newly created VPC",
+      "Value" :  { "Ref" : "BDVPC" }
+    },
     "Text" : {
       "Value" : "https://s3.amazonaws.com/awsbigdata-boot-camp/awsbigdata_boot_camp_text.pdf",
       "Description" : "Text for Amazon Big Data boot camp"

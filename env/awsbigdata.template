@@ -155,24 +155,6 @@
       }
     },
 
-    "IPAddress1" : {
-      "Type" : "AWS::EC2::EIP",
-      "DependsOn" : "BDClient1",
-      "Properties" : {
-        "Domain" : "vpc",
-        "InstanceId" : { "Ref" : "BDClient1" }
-      }
-    },    
-
-    "IPAddress2" : {
-      "Type" : "AWS::EC2::EIP",
-      "DependsOn" : "BDClient2",
-      "Properties" : {
-        "Domain" : "vpc",
-        "InstanceId" : { "Ref" : "BDClient2" }
-      }
-    },    
-
     "BDClient1": {  
       "Type": "AWS::EC2::Instance",
       "DependsOn" : "Subnet1",
@@ -182,9 +164,14 @@
       "Properties": {
         "ImageId" : { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" },
                           { "Fn::FindInMap" : [ "AWSInstanceType2Arch", "t1.micro", "Arch" ] } ] },
+        "NetworkInterfaces" : [{
+          "GroupSet"                 : [{ "Ref" : "BDBootcampSG" }],
+          "AssociatePublicIpAddress" : "true",
+          "DeviceIndex"              : "0",
+          "DeleteOnTermination"      : "true",
+          "SubnetId"                 : { "Ref" : "Subnet1" }
+        }],
         "InstanceType"   : "t1.micro",
-        "SecurityGroupIds" : [ {"Ref" : "BDBootcampSG"} ],
-        "SubnetId"  : { "Ref" : "Subnet1" },
         "KeyName"        : { "Ref" : "KeyName" },
         "Tags": [{"Key": "Name","Value": "Workstation 1"}],
         "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
@@ -223,9 +210,14 @@
       "Properties": {
         "ImageId" : { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" },
                           { "Fn::FindInMap" : [ "AWSInstanceType2Arch", "t1.micro", "Arch" ] } ] },
+        "NetworkInterfaces" : [{
+          "GroupSet"                 : [{ "Ref" : "BDBootcampSG" }],
+          "AssociatePublicIpAddress" : "true",
+          "DeviceIndex"              : "0",
+          "DeleteOnTermination"      : "true",
+          "SubnetId"                 : { "Ref" : "Subnet1" }
+        }],
         "InstanceType"   : "t1.micro",
-        "SecurityGroupIds" : [ {"Ref" : "BDBootcampSG"} ],
-        "SubnetId"  : { "Ref" : "Subnet1" },
         "KeyName"        : { "Ref" : "KeyName" },
         "Tags": [{"Key": "Name","Value": "Workstation 2"}],
         "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
