@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>BINGO</title>
+    <style>
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script src="https://s3-ap-northeast-1.amazonaws.com/toshiake-env/SampleKinesisApplication/js/aws-sdk-kinesis-sts.js"></script>
+    <script src="https://s3-ap-northeast-1.amazonaws.com/toshiake-env/SampleKinesisApplication/js/lodash.compat.min.js"></script>
+    <script src="https://s3-ap-northeast-1.amazonaws.com/toshiake-env/SampleKinesisApplication/js/d3.min.js"></script>
+    <script src="https://s3-ap-northeast-1.amazonaws.com/toshiake-env/SampleKinesisApplication/js/nv.d3.min.js"></script>
+    <script>
+
+function initialize() {
+  // Tokyo station
+  var myLatlng = new google.maps.LatLng(35.67791, 139.76414);
+  var mapOptions = {
+    zoom: 12,
+    center: myLatlng
+  }
+  map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+
+  AWS.config = new AWS.Config({
+    accessKeyId: 'MY_ACCESS_KEY',
+    secretAccessKey: 'MY_SECRET_KEY',
+    region: 'us-east-1'
+  });
+  kinesis = new AWS.Kinesis();
+  streamName = 'bigdata-bootcamp';
+  iteratorType = 'TRIM_HORIZON';
+  // iteratorType = 'LATEST';
+  userLocations = new Object();
+
+  getStream();
+}
+
+function getStream() {
+      kinesis.describeStream({StreamName: streamName}, function (err, data) {
+          if (err) {
+              console.log(err);
+              return;
+          }
+          if (_.size(data.StreamDescription.Shards > 1)) {
+              console.log('WARNING: this demo was designed to work with a single Kinesis shard');
+          }
+
+          kinesis.getShardIterator({StreamName:streamName,ShardId:data.StreamDescription.Shards[0].ShardId,ShardIteratorType:iteratorType},
+            getRecords);
+      });
+
+      setTimeout("getStream()", 1000);
+  }
+
+
+
+function getRecords(err, data) {
+    if (err) {
+        console.log(err);
+        return;
+    }
+    kinesis.getRecords({ShardIterator:data.ShardIterator,Limit:100}, function (err, data) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        if (_.size(data.Records) > 0) {
+            $.each(data.Records, function(){
+                // put marker on Google maps
+                var item = $.parseJSON(window.atob(this.Data));
+                var uid = item.user;
+                var currMarker = userLocations[uid];
+                if (currMarker != null) {
+                  currMarker.setMap(null);
+                  currMarker = null;
+                }
+
+                var myLatlng = new google.maps.LatLng(item.latitude,item.longitude);
+
+                var marker = new google.maps.Marker({
+                    position: myLatlng,
+                    title: uid
+                });
+                marker.setMap(map);
+                userLocations[uid] = marker;
+            });
+        }
+    });
+}
+
+window.onload = initialize;
+
+    </script>
+  </head>
+  <body>
+    <div id="map-canvas"></div>
+  </body>
+    <script src="https://s3-ap-northeast-1.amazonaws.com/toshiake-env/SampleKinesisApplication/js/jquery.js"></script>
+    <script src="https://s3-ap-northeast-1.amazonaws.com/toshiake-env/SampleKinesisApplication/js/bootstrap.min.js"></script>
+
+</html>
