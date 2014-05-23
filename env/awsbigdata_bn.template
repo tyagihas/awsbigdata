@@ -288,10 +288,6 @@
   },     
 
   "Outputs" : {
-    "VpcId" : {
-      "Description" : "VPCId of the newly created VPC",
-      "Value" :  { "Ref" : "BDVPC" }
-    },
     "Text" : {
       "Value" : "https://s3.amazonaws.com/awsbigdata-boot-camp/awsbigdata_boot_camp_text.pdf",
       "Description" : "Text for Amazon Big Data boot camp"
@@ -300,9 +296,23 @@
       "Value" : "https://github.com/tyagihas/awsbigdata",
       "Description" : "Hands-on files for Amazon Big Data boot camp"
     },
-    "Status" : {
-      "Value" : "completed",
-      "Description" : "Amazon Big Data boot camp environment is built successfully."
+    "VPC" : {
+            "Description": "VPC ID",
+            "Value": {
+                "Ref": "BDVPC"
+            }
+    },
+    "Workstation1" : {
+            "Description": "Instance ID of Workstation 1",
+            "Value": {
+                "Ref": "BDClient1"
+            }
+    },
+    "Workstation2" : {
+            "Description": "Instance ID of Workstation 2",
+            "Value": {
+                "Ref": "BDClient2"
+            }
     }
   }
 }
