@@ -26,15 +26,23 @@ public class LogAnalyzer {
 	public LogAnalyzer() throws SQLException {
 		accessPath = System.getProperty("kinesisapp.accesspath");
 		query = System.getProperty("kinesisapp.query");
-		
-		conn = DriverManager.getConnection(
-				System.getProperty("kinesisapp.jdbcurl"), 
-				System.getProperty("kinesisapp.dbuser"), 
-				System.getProperty("kinesisapp.dbpassword"));
-		conn.setAutoCommit(true);
+
+		String debug = (System.getProperty("kinesisapp.debug") == null) ? "false" : System.getProperty("kinesisapp.debug"); 
+		if (debug.equals("true")) {
+			users = new HashSet<String>();
+			for(int i = 10001; i < 11000; i++) 
+				users.add(Integer.toString(i));
+		}
+		else {
+			conn = DriverManager.getConnection(
+					System.getProperty("kinesisapp.jdbcurl"), 
+					System.getProperty("kinesisapp.dbuser"), 
+					System.getProperty("kinesisapp.dbpassword"));
+			conn.setAutoCommit(true);
+		}
 	}
 	
-	public HashSet<String> getUsers() throws SQLException {
+	public HashSet<String> getUsers() throws SQLException {		
 		if (users == null) {
 			users = new HashSet<String>();
 			PreparedStatement stmt = conn.prepareStatement(query);

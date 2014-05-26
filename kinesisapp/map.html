@@ -1,34 +1,69 @@
+<!DOCTYPE html>
 <html>
-<head>
-<script type='text/javascript' src='//code.jquery.com/jquery-1.10.2.js'></script>
-<script type="text/javascript">
-    var host = window.document.location.host.replace(/:.*/, '');
-    var kinesisSocket = new WebSocket("ws://" + host + ":80/kinesisapp/stream");
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>BINGO</title>
+    <style>
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script src="https://s3-ap-northeast-1.amazonaws.com/toshiake-env/SampleKinesisApplication/js/lodash.compat.min.js"></script>
+    <script src="https://s3-ap-northeast-1.amazonaws.com/toshiake-env/SampleKinesisApplication/js/d3.min.js"></script>
+    <script src="https://s3-ap-northeast-1.amazonaws.com/toshiake-env/SampleKinesisApplication/js/nv.d3.min.js"></script>
+    <script type='text/javascript' src='//code.jquery.com/jquery-1.10.2.js'></script>
+    <script src="https://s3-ap-northeast-1.amazonaws.com/toshiake-env/SampleKinesisApplication/js/bootstrap.min.js"></script>
+    <!-- <script src="https://s3-ap-northeast-1.amazonaws.com/toshiake-env/SampleKinesisApplication/js/jquery.js"></script> -->
 
-    kinesisSocket.onopen = function(e) {
-        console.log("onopen()");
-        <!-- kinesisSocket.send("Hellooooo"); -->
+    <script type="text/javascript">
+function initialize() {
+    // Tokyo station
+    var myLatlng = new google.maps.LatLng(35.67791, 139.76414);
+    var mapOptions = {
+        zoom: 12,
+    	center: myLatlng
     }
+    map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+    userLocations = new Object();
+}
     
-    kinesisSocket.onmessage = function(e) {
-    	console.log(e.data);
-    	var attributes = e.data.split(',');
-        var size = '2px';
-        $("body").append(
-            $('<div></div>')
-                .css('position', 'absolute')
-                .css('top', attributes[1] + 'px')
-                .css('left', attributes[2] + 'px')
-                .css('width', size)
-                .css('height', size)
-                .css('background-color', attributes[0])
-        );
-    };
-</script>
-</head>
+var host = window.document.location.host.replace(/:.*/, '');
+var kinesisSocket = new WebSocket("ws://" + host + ":80/kinesisapp/stream");
 
-<body>
-<img id="tokyo" src="./tokyo.gif"></img>
-</body>
+kinesisSocket.onopen = function(e) {
+    console.log("onopen()");
+    <!-- kinesisSocket.send("Hellooooo"); -->
+}
+    
+kinesisSocket.onmessage = function(e) {
+    console.log(e.data);
+    var attributes = e.data.split(',');
+    var uid = attributes[0];
+    var currMarker = userLocations[uid];
+    if (currMarker != null) {
+        currMarker.setMap(null);
+        currMarker = null;
+    }
+
+    var myLatlng = new google.maps.LatLng(attributes[1],attributes[2]);
+    var marker = new google.maps.Marker({
+	    position: myLatlng,
+        title: uid
+    });
+    marker.setMap(map);
+    userLocations[uid] = marker;
+};
+
+window.onload = initialize;
+
+    </script>
+  </head>
+  <body>
+    <div id="map-canvas"></div>
+  </body>
 
 </html>

@@ -1,10 +1,12 @@
 package com.amazonaws.services.kinesis.app;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+
 
 // import com.amazonaws.services.dynamodb.loader.Loader;
 import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessor;
@@ -68,22 +70,21 @@ public class Processor implements IRecordProcessor {
 			try {
 				verifyRecord(rec.getData());
 			} 
-			catch (JSONException e) {
+			catch (JSONException | UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 	
-	private boolean verifyRecord(ByteBuffer buffer) throws JSONException {
+	private boolean verifyRecord(ByteBuffer buffer) throws JSONException, UnsupportedEncodingException {
 		buffer.get(bytearray, 0, buffer.remaining());
-		JSONObject json = new JSONObject(new String(bytearray));
+		JSONObject json = new JSONObject(new String(bytearray, "UTF-8"));
 		String user = json.getString("user");
 		if (users.contains(user)) {
 			MessageProxy proxy = MessageProxy.getInstance();
-			String color = "#0" + user;
 			double x = json.getDouble("latitude");
 			double y = json.getDouble("longitude");
-			proxy.sendMesg(color + "," + Double.toString(700-(x-35.52)*3684) + "," + Double.toString((y-139.51)*1769));
+			proxy.sendMesg(user + "," + json.getDouble("latitude") + "," + json.getDouble("longitude"));
 			System.out.println(x + "," + y);
 			if (coordsListener.verifyCoordinates(x, y)) {
 				System.out.println("Matched! '" + user + "' is at (" + x + ", " + y + ")");
@@ -99,7 +100,7 @@ public class Processor implements IRecordProcessor {
 	public void shutdown(IRecordProcessorCheckpointer arg0, ShutdownReason arg1) {
 	}
 	
-	public void test() throws JSONException {
+	public void test() throws JSONException, UnsupportedEncodingException {
 		String str = "00001,35.65,139.65";
 		initialize("test");
 		ByteBuffer buffer = ByteBuffer.allocateDirect(128);

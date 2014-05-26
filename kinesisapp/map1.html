@@ -1,0 +1,34 @@
+<html>
+<head>
+<script type='text/javascript' src='//code.jquery.com/jquery-1.10.2.js'></script>
+<script type="text/javascript">
+    var host = window.document.location.host.replace(/:.*/, '');
+    var kinesisSocket = new WebSocket("ws://" + host + ":80/kinesisapp/stream");
+
+    kinesisSocket.onopen = function(e) {
+        console.log("onopen()");
+        <!-- kinesisSocket.send("Hellooooo"); -->
+    }
+    
+    kinesisSocket.onmessage = function(e) {
+    	console.log(e.data);
+    	var attributes = e.data.split(',');
+        var size = '2px';
+        $("body").append(
+            $('<div></div>')
+                .css('position', 'absolute')
+                .css('top', attributes[1] + 'px')
+                .css('left', attributes[2] + 'px')
+                .css('width', size)
+                .css('height', size)
+                .css('background-color', attributes[0])
+        );
+    };
+</script>
+</head>
+
+<body>
+<img id="tokyo" src="./tokyo.gif"></img>
+</body>
+
+</html>
