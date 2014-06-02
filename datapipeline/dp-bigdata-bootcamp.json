@@ -1,0 +1,151 @@
+{
+  "objects": [
+    {
+      "id": "ActivityId_ngqI8",
+      "input": {
+        "ref": "DataNodeId_TrQjB"
+      },
+      "schedule": {
+        "ref": "DefaultSchedule"
+      },
+      "insertMode": "TRUNCATE",
+      "name": "redshift-copy",
+      "runsOn": {
+        "ref": "ResourceId_hgh6C"
+      },
+      "type": "RedshiftCopyActivity",
+      "output": {
+        "ref": "DataNodeId_SqzfS"
+      }
+    },
+    {
+      "id": "DataNodeId_SqzfS",
+      "schedule": {
+        "ref": "DefaultSchedule"
+      },
+      "tableName": "logs",
+      "name": "redshift-logs-table",
+      "createTableSql": "CREATE table logs (\nuser1 VARCHAR(10),\npath VARCHAR(2048),\ntime VARCHAR(24),\ngeoip VARCHAR(255)\n);",
+      "type": "RedshiftDataNode",
+      "database": {
+        "ref": "RedshiftDatabaseId_6ERdQ"
+      }
+    },
+    {
+      "id": "DataNodeId_TrQjB",
+      "schedule": {
+        "ref": "DefaultSchedule"
+      },
+      "directoryPath": "s3://MY_BUCKET/csv",
+      "name": "s3-log-output",
+      "dataFormat": {
+        "ref": "DataFormatId_kVy56"
+      },
+      "type": "S3DataNode"
+    },
+    {
+      "id": "DefaultSchedule",
+      "occurrences": "1",
+      "name": "RunOnce",
+      "startAt": "FIRST_ACTIVATION_DATE_TIME",
+      "type": "Schedule",
+      "period": "1 Day"
+    },
+    {
+      "terminateAfter": "1 Hour",
+      "id": "ResourceId_hgh6C",
+      "schedule": {
+        "ref": "DefaultSchedule"
+      },
+      "keyPair": "MY_KEY_PAIR",
+      "securityGroups": "jump",
+      "name": "ec2-workstation",
+      "role": "DataPipelineDefaultRole",
+      "logUri": "s3://MY_BUCKET/logs/datapipeline",
+      "type": "Ec2Resource",
+      "resourceRole": "DataPipelineDefaultResourceRole"
+    },
+    {
+      "id": "ActivityId_PcHNa",
+      "input": {
+        "ref": "DataNodeId_4WlmB"
+      },
+      "schedule": {
+        "ref": "DefaultSchedule"
+      },
+      "hiveScript": "INSERT OVERWRITE TABLE ${output1} select b.* from ${input1} a LATERAL VIEW json_tuple(a.log, 'user', 'path', '@timestamp', 'geoip') b as user, path, ts, geoip;",
+      "generatedScriptsPath": "s3://MY_BUCKET/hive",
+      "name": "hive-etl",
+      "runsOn": {
+        "ref": "EmrClusterId_sXRvE"
+      },
+      "output": {
+        "ref": "DataNodeId_TrQjB"
+      },
+      "type": "HiveActivity"
+    },
+    {
+      "id": "RedshiftDatabaseId_6ERdQ",
+      "databaseName": "mydb",
+      "username": "master",
+      "name": "redshift-mydb",
+      "*password": "MY_PASSOWRD",
+      "type": "RedshiftDatabase",
+      "clusterId": "mycluster"
+    },
+    {
+      "id": "DataNodeId_4WlmB",
+      "schedule": {
+        "ref": "DefaultSchedule"
+      },
+      "directoryPath": "s3://awsbigdata-boot-camp/input",
+      "name": "s3-log-input",
+      "dataFormat": {
+        "ref": "DataFormatId_L1e3a"
+      },
+      "type": "S3DataNode"
+    },
+    {
+      "id": "DataFormatId_L1e3a",
+      "name": "log-json",
+      "column": "log",
+      "type": "TSV"
+    },
+    {
+      "id": "Default",
+      "scheduleType": "CRON",
+      "failureAndRerunMode": "CASCADE",
+      "schedule": {
+        "ref": "DefaultSchedule"
+      },
+      "name": "Default",
+      "role": "DataPipelineDefaultRole",
+      "resourceRole": "DataPipelineDefaultResourceRole"
+    },
+    {
+      "id": "DataFormatId_kVy56",
+      "name": "log-csv",
+      "column": [
+        "user",
+        "path",
+        "ts",
+        "geoip"
+      ],
+      "type": "CSV"
+    },
+    {
+      "terminateAfter": "1 Hour",
+      "id": "EmrClusterId_sXRvE",
+      "emrLogUri": "s3://MY_BUCKET/logs/emr",
+      "schedule": {
+        "ref": "DefaultSchedule"
+      },
+      "keyPair": "MY_KEY_PAIR",
+      "coreInstanceType": "m3.xlarge",
+      "name": "emr-etl",
+      "coreInstanceCount": "3",
+      "logUri": "s3://MY_BUCKET/logs/datapipeline",
+      "type": "EmrCluster"
+    }
+  ]
+}
