@@ -1,0 +1,151 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  
+  "Description" : "AWS CloudFormation Template for AWS Big Data Boot Camp",
+  
+  "Parameters" : {
+    "KeyName" : {
+      "Description" : "Enter name of an existing EC2 KeyPair to enable SSH access to the instances",
+      "Type" : "String",
+      "MinLength": "1",
+      "MaxLength": "64",
+      "AllowedPattern" : "[-_ a-zA-Z0-9]*",
+      "ConstraintDescription" : "can contain only alphanumeric characters, spaces, dashes and underscores."
+    },
+
+    "AWSAccessKey": {
+      "Type": "String",
+      "Description" : "Enter AWS Access Key."
+    },
+
+    "AWSSecretAccessKey": {
+      "Type": "String",
+      "Description" : "Enter AWS Secret Access Key."
+    },
+
+    "SubnetId" : {
+      "Type" : "String",
+      "Description" : "Default subnet Id"
+    }
+  },
+  
+  "Mappings" : {
+    "AWSInstanceType2Arch" : {
+      "t1.micro"    : { "Arch" : "64" }
+    },
+
+    "AWSRegionArch2AMI" : {
+            "us-east-1": { "64": "ami-b7fee2de" }
+    }
+  },
+    
+  "Resources" : {     
+    "BDClient1": {  
+      "Type": "AWS::EC2::Instance",
+      "Metadata" : {
+        "Comment1" : "Copying files and installing psql command line utility"
+      },
+      "Properties": {
+        "ImageId" : { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" },
+                          { "Fn::FindInMap" : [ "AWSInstanceType2Arch", "t1.micro", "Arch" ] } ] },
+        "NetworkInterfaces" : [{
+          "GroupSet"                 : [{ "Ref" : "BDBootcampSG" }],
+          "AssociatePublicIpAddress" : "true",
+          "DeviceIndex"              : "0",
+          "DeleteOnTermination"      : "true"
+        }],
+        "InstanceType"   : "t1.micro",
+        "KeyName"        : { "Ref" : "KeyName" },
+        "Tags": [{"Key": "Name","Value": "Workstation 1"}],
+        "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
+          "#!/bin/bash\n",
+          "cd /home/ec2-user\n",
+          "git clone https://github.com/tyagihas/awsbigdata.git\n",
+          "cd ./awsbigdata/kinesisapp\n",
+          "/home/ec2-user/ant/bin/ant > build.log\n",
+          "chmod 755 *.sh\n",
+          "chown -R ec2-user:ec2-user /home/ec2-user\n",
+          "echo 'export AWS_ACCESS_KEY=",
+          {
+            "Ref": "AWSAccessKey"
+          },
+          "'  >> /home/ec2-user/.bash_profile\n",
+          "echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY' >> /home/ec2-user/.bash_profile\n",
+          "echo 'export AWS_SECRET_ACCESS_KEY=",
+          {
+            "Ref": "AWSSecretAccessKey"
+          },
+          "'  >> /home/ec2-user/.bash_profile\n",
+          "echo 'export AWS_SECRET_KEY=$AWS_SECRET_ACCESS_KEY' >> /home/ec2-user/.bash_profile\n",
+          "/opt/aws/bin/cfn-signal -e 0 -r \"cfn-int setup complete\" '",
+          { "Ref": "WaitHandle"},
+          "'\n"
+        ]]}}        
+      }
+    },
+
+    "BDBootcampSG" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Enabling HTTP,SSH and Redshift access",
+        "SecurityGroupIngress" : [
+          {"IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"},
+          {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : "0.0.0.0/0"},
+          {"IpProtocol" : "tcp", "FromPort" : "5439", "ToPort" : "5439", "CidrIp" : "0.0.0.0/0"}
+        ]
+      }      
+    },
+
+    "BDClusterSubnetGroup" : {
+      "Type": "AWS::Redshift::ClusterSubnetGroup",
+      "Properties": {
+        "Description" : "Redshift Cluster Subnet Group",
+        "SubnetIds" : [{ "Ref" : "SubnetId" }]
+      }
+    },
+
+    "BDRedshiftCluster" : {
+      "Type": "AWS::Redshift::Cluster",
+      "DependsOn" : "BDClusterSubnetGroup",
+      "Properties": {
+        "MasterUsername" : "awsuser",
+        "MasterUserPassword" : "Password1",
+        "ClusterSubnetGroupName" : { "Ref" : "BDClusterSubnetGroup" },
+        "DBName" : "bddb",
+        "NodeType" : "dw2.large",
+        "ClusterType" : "single-node",
+        "VpcSecurityGroupIds" : [{ "Ref" : "BDBootcampSG" }]
+      }
+    },
+
+    "WaitHandle" : {
+      "Type" : "AWS::CloudFormation::WaitConditionHandle"
+    },
+
+    "WaitCondition" : {
+      "Type" : "AWS::CloudFormation::WaitCondition",
+      "DependsOn" : "BDClient1",
+      "Properties" : {
+        "Handle" : {"Ref" : "WaitHandle"},
+        "Timeout" : "600"
+      }
+    }
+  },     
+
+  "Outputs" : {
+    "Text" : {
+      "Value" : "https://s3.amazonaws.com/awsbigdata-boot-camp/awsbigdata_boot_camp_text.pdf",
+      "Description" : "Text for Amazon Big Data boot camp"
+    },
+    "Files" : {
+      "Value" : "https://github.com/tyagihas/awsbigdata",
+      "Description" : "Hands-on files for Amazon Big Data boot camp"
+    },
+    "Workstation1" : {
+            "Description": "Instance ID of Workstation 1",
+            "Value": {
+                "Ref": "BDClient1"
+            }
+    }
+  }
+}
