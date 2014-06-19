@@ -58,7 +58,7 @@
         "ref": "DefaultSchedule"
       },
       "keyPair": "MY_KEY_PAIR",
-      "securityGroups": "jump",
+      "securityGroups": "MY_SG",
       "name": "ec2-workstation",
       "role": "DataPipelineDefaultRole",
       "logUri": "s3://MY_BUCKET/logs/datapipeline",
@@ -86,12 +86,12 @@
     },
     {
       "id": "RedshiftDatabaseId_6ERdQ",
-      "databaseName": "mydb",
-      "username": "master",
+      "databaseName": "bddb",
+      "username": "awsuser",
       "name": "redshift-mydb",
-      "*password": "MY_PASSOWRD",
+      "*password": "Password1",
       "type": "RedshiftDatabase",
-      "clusterId": "mycluster"
+      "clusterId": "MY_CLUSTER"
     },
     {
       "id": "DataNodeId_4WlmB",
