@@ -272,7 +272,7 @@
 
     "BDRedshiftCluster" : {
       "Type": "AWS::Redshift::Cluster",
-      "DependsOn" : "BDClusterSubnetGroup",
+      "DependsOn" : [ "BDClusterSubnetGroup", "AttachGateway" ],
       "Properties": {
         "MasterUsername" : "awsuser",
         "MasterUserPassword" : "Password1",
@@ -280,6 +280,7 @@
         "DBName" : "bddb",
         "NodeType" : "dw2.large",
         "ClusterType" : "single-node",
+	"PubliclyAccessible" : "false",
         "VpcSecurityGroupIds" : [{ "Ref" : "BDBootcampSG" }]
       }
     },
