@@ -26,6 +26,9 @@ public class Loader {
 	
 	public Loader() {
 		tableName = System.getProperty("kinesisapp.dynamodbtable");
+		if (tableName.equals("")) 
+			tableName = null;
+		
 		if (tableName != null) {
 			// Assuming a dynamo table already exists
 			client = new AmazonDynamoDBClient();
