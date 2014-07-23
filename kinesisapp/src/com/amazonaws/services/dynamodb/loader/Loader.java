@@ -27,6 +27,9 @@ public class Loader {
 	public Loader() {
 		tableName = System.getProperty("kinesisapp.dynamodbtable");
 		if (tableName != null) {
+			// Assuming a dynamo table already exists
+			client = new AmazonDynamoDBClient();
+			/*
 			try {
 				client = new AmazonDynamoDBClient();
 
@@ -50,19 +53,22 @@ public class Loader {
 			} catch(ResourceInUseException e) {
 				System.out.println(tableName + " already exists.");
 			}
+			*/
 		}
 	}
 	
 	public void put(String user, long timestamp, double x, double y) {
-		Map<String, AttributeValue> item = new HashMap<String, AttributeValue>();
-		item.put("user", new AttributeValue().withS(user));
-		item.put("timestamp", new AttributeValue().withS(Long.toString(timestamp)));
-		item.put("latitude", new AttributeValue().withS(Double.toString(x)));
-		item.put("longitude", new AttributeValue().withS(Double.toString(y)));
+		if (tableName != null) {
+			Map<String, AttributeValue> item = new HashMap<String, AttributeValue>();
+			item.put("user", new AttributeValue().withS(user));
+			item.put("timestamp", new AttributeValue().withS(Long.toString(timestamp)));
+			item.put("latitude", new AttributeValue().withS(Double.toString(x)));
+			item.put("longitude", new AttributeValue().withS(Double.toString(y)));
 
-		PutItemRequest putItemRequest = new PutItemRequest()
-		    .withTableName(tableName)
-		    .withItem(item);
-		PutItemResult result = client.putItem(putItemRequest);
+			PutItemRequest putItemRequest = new PutItemRequest()
+			.withTableName(tableName)
+			.withItem(item);
+			PutItemResult result = client.putItem(putItemRequest);
+		}
 	}
 }
