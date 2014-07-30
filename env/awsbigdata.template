@@ -32,13 +32,13 @@
   
   "Mappings" : {
     "AWSInstanceType2Arch" : {
-      "t2.micro"    : { "Arch" : "64" }
+      "t1.micro"    : { "Arch" : "64" }
     },
 
     "AWSRegionArch2AMI" : {
-            "us-east-1": { "64": "ami-76817c1e" },
-            "us-west-2": { "64": "ami-d13845e1" },
-            "ap-northeast-1": { "64": "ami-29dc9228" }
+            "us-east-1": { "64": "ami-b7fee2de" },
+            "us-west-2": { "64": "ami-4d4f347d" },
+            "ap-northeast-1": { "64": "ami-1f3e611e" }
     }
   },
     
@@ -157,7 +157,7 @@
       }
     },
 
-    "BDClient1": {  
+    "BDClient1": {
       "Type": "AWS::EC2::Instance",
       "DependsOn" : "Subnet1",
       "Metadata" : {
@@ -165,60 +165,50 @@
       },
       "Properties": {
         "ImageId" : { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" },
-                          { "Fn::FindInMap" : [ "AWSInstanceType2Arch", "t2.micro", "Arch" ] } ] },
+                          { "Fn::FindInMap" : [ "AWSInstanceType2Arch", "t1.micro", "Arch" ] } ] },
         "NetworkInterfaces" : [{
-          "GroupSet"                 : [{ "Ref" : "BDBootcampSG" }],
+          "GroupSet" : [{ "Ref" : "BDBootcampSG" }],
           "AssociatePublicIpAddress" : "true",
-          "DeviceIndex"              : "0",
-          "DeleteOnTermination"      : "true",
-          "SubnetId"                 : { "Ref" : "Subnet1" }
+          "DeviceIndex" : "0",
+          "DeleteOnTermination" : "true",
+          "SubnetId" : { "Ref" : "Subnet1" }
         }],
-        "InstanceType"   : "t2.micro",
-        "KeyName"        : { "Ref" : "KeyName" },
+        "InstanceType" : "t1.micro",
+        "KeyName" : { "Ref" : "KeyName" },
         "Tags": [{"Key": "Name","Value": "Workstation 1"}],
-        "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
+        "UserData" : { "Fn::Base64" : { "Fn::Join" : ["", [
           "#!/bin/bash\n",
           "cd /home/ec2-user\n",
-          "yum update -y\n",
-          "yum -y install git\n",
-          "yum -y install postgresql\n",
-	  "yum -y install ant\n",
-	  "wget https://s3.amazonaws.com/awsbigdata-boot-camp/lib.zip\n",
-          "unzip ./lib.zip\n",
-          "rm ./lib.zip\n",
           "git clone https://github.com/tyagihas/awsbigdata.git\n",
-          "echo 'export JAVA_HOME=/etc/alternatives/java_sdk\n",
-          "'  >> /home/ec2-user/.bash_profile\n",
+          "cd ./awsbigdata/kinesisapp\n",
+          "/home/ec2-user/ant/bin/ant > build.log\n",
+          "chmod 755 *.sh\n",
+          "chown -R ec2-user:ec2-user /home/ec2-user\n",
           "echo 'export AWS_ACCESS_KEY=",
           {
             "Ref": "AWSAccessKey"
           },
-          "'  >> /home/ec2-user/.bash_profile\n",
+          "' >> /home/ec2-user/.bash_profile\n",
           "echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY' >> /home/ec2-user/.bash_profile\n",
           "echo 'export AWS_SECRET_ACCESS_KEY=",
           {
             "Ref": "AWSSecretAccessKey"
           },
-          "'  >> /home/ec2-user/.bash_profile\n",
+          "' >> /home/ec2-user/.bash_profile\n",
           "echo 'export AWS_SECRET_KEY=$AWS_SECRET_ACCESS_KEY' >> /home/ec2-user/.bash_profile\n",
           "echo 'export EP=https://kinesis.",
           {
             "Ref": "AWS::Region"
           },
           ".amazonaws.com'  >> /home/ec2-user/.bash_profile\n",
-	  "source /home/ec2-user/.bash_profile\n",
-          "cd ./awsbigdata/kinesisapp\n",
-          "/home/ec2-user/ant/bin/ant > build.log\n",
-          "chmod 755 *.sh\n",
-          "chown -R ec2-user:ec2-user /home/ec2-user\n",
           "/opt/aws/bin/cfn-signal -e 0 -r \"cfn-int setup complete\" '",
           { "Ref": "WaitHandle"},
           "'\n"
         ]]}}
-      }        
+      }
     },
 
-    "BDClient2": {  
+    "BDClient2": {
       "Type": "AWS::EC2::Instance",
       "DependsOn" : "Subnet1",
       "Metadata" : {
@@ -226,59 +216,48 @@
       },
       "Properties": {
         "ImageId" : { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" },
-                          { "Fn::FindInMap" : [ "AWSInstanceType2Arch", "t2.micro", "Arch" ] } ] },
+                          { "Fn::FindInMap" : [ "AWSInstanceType2Arch", "t1.micro", "Arch" ] } ] },
         "NetworkInterfaces" : [{
-          "GroupSet"                 : [{ "Ref" : "BDBootcampSG" }],
+          "GroupSet" : [{ "Ref" : "BDBootcampSG" }],
           "AssociatePublicIpAddress" : "true",
-          "DeviceIndex"              : "0",
-          "DeleteOnTermination"      : "true",
-          "SubnetId"                 : { "Ref" : "Subnet1" }
+          "DeviceIndex" : "0",
+          "DeleteOnTermination" : "true",
+          "SubnetId" : { "Ref" : "Subnet1" }
         }],
-        "InstanceType"   : "t2.micro",
-        "KeyName"        : { "Ref" : "KeyName" },
+        "InstanceType" : "t1.micro",
+        "KeyName" : { "Ref" : "KeyName" },
         "Tags": [{"Key": "Name","Value": "Workstation 2"}],
-        "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
+        "UserData" : { "Fn::Base64" : { "Fn::Join" : ["", [
           "#!/bin/bash\n",
           "cd /home/ec2-user\n",
-          "yum update -y\n",
-          "yum -y install git\n",
-          "yum -y install postgresql\n",
-	  "yum -y install ant\n",
-	  "wget https://s3.amazonaws.com/awsbigdata-boot-camp/lib.zip\n",
-          "unzip ./lib.zip\n",
-          "rm ./lib.zip\n",
           "git clone https://github.com/tyagihas/awsbigdata.git\n",
-          "echo 'export JAVA_HOME=/etc/alternatives/java_sdk\n",
-          "'  >> /home/ec2-user/.bash_profile\n",
+          "cd ./awsbigdata/kinesisapp\n",
+          "/home/ec2-user/ant/bin/ant > build.log\n",
+          "chmod 755 *.sh\n",
+          "chown -R ec2-user:ec2-user /home/ec2-user\n",
           "echo 'export AWS_ACCESS_KEY=",
           {
             "Ref": "AWSAccessKey"
           },
-          "'  >> /home/ec2-user/.bash_profile\n",
+          "' >> /home/ec2-user/.bash_profile\n",
           "echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY' >> /home/ec2-user/.bash_profile\n",
           "echo 'export AWS_SECRET_ACCESS_KEY=",
           {
             "Ref": "AWSSecretAccessKey"
           },
-          "'  >> /home/ec2-user/.bash_profile\n",
+          "' >> /home/ec2-user/.bash_profile\n",
           "echo 'export AWS_SECRET_KEY=$AWS_SECRET_ACCESS_KEY' >> /home/ec2-user/.bash_profile\n",
           "echo 'export EP=https://kinesis.",
           {
             "Ref": "AWS::Region"
           },
           ".amazonaws.com'  >> /home/ec2-user/.bash_profile\n",
-	  "source /home/ec2-user/.bash_profile\n",
-          "cd ./awsbigdata/kinesisapp\n",
-          "/home/ec2-user/ant/bin/ant > build.log\n",
-          "chmod 755 *.sh\n",
-          "chown -R ec2-user:ec2-user /home/ec2-user\n",
           "/opt/aws/bin/cfn-signal -e 0 -r \"cfn-int setup complete\" '",
           { "Ref": "WaitHandle"},
           "'\n"
-        ]]}}        
+        ]]}}
       }
     },
-
     "BDBootcampSG" : {
       "Type" : "AWS::EC2::SecurityGroup",
       "DependsOn" : "BDVPC",
