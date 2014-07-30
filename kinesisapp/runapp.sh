@@ -20,4 +20,4 @@ do
   CPATH=${CPATH}:${i}
 done
 
-java -cp $CPATH:./dist/kinesisapp.jar $JVM_Params -Dkinesisapp.name=$APPNAME -Dkinesisapp.stream=$STREAM -Dkinesisapp.coordsw=$COORDSW -Dkinesisapp.coordne=$COORDNE -Dkinesisapp.accesspath=$ACCESSPATH -Dkinesisapp.query="$QUERY" -Dkinesisapp.jdbcurl=$JDBCURL -Dkinesisapp.dbuser=$DBUSER -Dkinesisapp.dbpassword=$DBPASSWORD -Dkinesisapp.dynamodbtable=$DYTABLE com.amazonaws.services.kinesis.app.KinesisServer
+java -cp $CPATH:./dist/kinesisapp.jar $JVM_Params -Dkinesisapp.endpoint=$EP -Dkinesisapp.name=$APPNAME -Dkinesisapp.stream=$STREAM -Dkinesisapp.coordsw=$COORDSW -Dkinesisapp.coordne=$COORDNE -Dkinesisapp.accesspath=$ACCESSPATH -Dkinesisapp.query="$QUERY" -Dkinesisapp.jdbcurl=$JDBCURL -Dkinesisapp.dbuser=$DBUSER -Dkinesisapp.dbpassword=$DBPASSWORD -Dkinesisapp.dynamodbtable=$DYTABLE com.amazonaws.services.kinesis.app.KinesisServer

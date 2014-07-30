@@ -45,7 +45,8 @@ public class KinesisServer {
         KinesisClientLibConfiguration kinesisConfig = new KinesisClientLibConfiguration(
         		System.getProperty("kinesisapp.name"), 
         		System.getProperty("kinesisapp.stream"), 
-        		credentialsProvider, Long.toString(System.currentTimeMillis()));
+        		credentialsProvider, Long.toString(System.currentTimeMillis()))
+        		.withKinesisEndpoint(System.getProperty("kinesisapp.endpoint"));
         
         IRecordProcessorFactory factory = new Factory();
         Worker worker = new Worker(factory, kinesisConfig);
