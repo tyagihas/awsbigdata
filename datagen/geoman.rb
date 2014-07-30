@@ -45,11 +45,14 @@ yamanote_line.sort! { |x, y|
   x["station_no"] <=> y["station_no"]
 }
 
+kinesis_ep = ENV['EP'] || "https://kinesis.us-east-1.amazonaws.com"
+region = ep[16, ep.length - 30]
+
 AWS.config({
   :access_key_id => ENV['AWS_ACCESS_KEY_ID'],
   :secret_access_key => ENV['AWS_SECRET_KEY'],
   # :region => ENV['AWS_REGION']
-  :region => "us-east-1"
+  :region => region
 })
 puts "Initializing Kinesis client..."
 @client = AWS.kinesis.client
