@@ -46,7 +46,7 @@ yamanote_line.sort! { |x, y|
 }
 
 kinesis_ep = ENV['EP'] || "https://kinesis.us-east-1.amazonaws.com"
-region = ep[16, ep.length - 30]
+region = kinesis_ep[16, kinesis_ep.length - 30]
 
 AWS.config({
   :access_key_id => ENV['AWS_ACCESS_KEY_ID'],
