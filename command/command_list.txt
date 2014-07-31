@@ -27,7 +27,16 @@ ROW FORMAT SERDE 'com.amazon.elasticmapreduce.JsonSerde'
 with serdeproperties (
 'paths'='host,user,method,path,code,size,referer,@node,@timestamp,@version,type,tags,geoip.country_code2'
 )
-LOCATION 's3://awsbigdata-boot-camp/input/';
+LOCATION 's3://{data_input_bucket}/input/';
+
+/*
+* data_input_bucketの値
+*
+* Tokyo: awsbigdata-boot-camp-tokyo
+* Oregon: awsbigdata-boot-camp-oregon
+* Virginia: awsbigdata-boot-camp
+*/
+
 
 /*
 *
@@ -83,7 +92,7 @@ geoip VARCHAR(2)
 *
 * Copy data from S3 to Redshift table
 * Please input your S3 bucket name into FROM section and CREDENTIALS into CREDENTIALS section.
-* 
+*
 */
 COPY logs from 's3://{input_your_bucket}/output/'
 CREDENTIALS 'aws_access_key_id={input_your_access_key};aws_secret_access_key={input_your_secret_key}'
