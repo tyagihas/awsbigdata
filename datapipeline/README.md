@@ -1,7 +1,17 @@
 Data Pipeline Hands-on
 ======================
+今回は事前に用意したpipelineのテンプレートをインポートし、Data Pieplineの機能を触って
 
-# CLIインストール
+# Data Pipeline CLIをインストール
+
+Data Pipeline CLIを使ってpipelineの作成や管理ができます。
+
+## 依存環境をインストール
+Rubyが必要です。Rubyがインストールされていない環境は、[こちらの手順](http://docs.aws.amazon.com/datapipeline/latest/DeveloperGuide/dp-install-command-line-client.html)でRubyのインストールとセットアップを行います。
+
+インストールには時間がかかりますので、LinuxのEC2インスタンスを起動して作業すると早いのでおすすめします。
+
+## CLIインストール
 
 [Data Pipeline Command Line Tool](http://aws.amazon.com/developertools/AWS-Data-Pipeline/2762849641295030)をダウンロードし、解凍する。
 
@@ -33,3 +43,5 @@ Data Pipeline Hands-on
     $ datapipeline --credentials ~/.aws/dp-config.json --create bigdata-bootcamp --put dp-bigdata-bootcamp.json
 
 Data Pipelineコンソールからインポートしたpipelineを確認し、activateさせる。コンソールにて、pipelineによって起動されたEMRクラスタや、Redshiftのテーブルにロードされたデータを確認。
+
+EMRクラスタはEMRコンソールで確認します。Redshiftデータは作業用EC2のPostgreSQLコマンドで確認します。
