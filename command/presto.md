@@ -60,7 +60,7 @@ Replace ACCESS_KEY & SECRET_KEY with your keys
 
     hive
 
-    # create hive table
+    -- create hive table
     DROP TABLE IF EXISTS apachelog;
     CREATE  EXTERNAL  TABLE apachelogs
     (
@@ -70,7 +70,7 @@ Replace ACCESS_KEY & SECRET_KEY with your keys
     LOCATION  's3://rosetta2-logs/apache';
 
 
-    # Hive JSON query
+    -- Hive JSON query
     select b.*
     from apachelogs a
     LATERAL VIEW json_tuple(a.log, 'code', 'path') b
